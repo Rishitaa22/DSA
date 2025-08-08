@@ -1,54 +1,106 @@
 #include <stdio.h>
 
-#define MAX 10
+int main() {
+    int row, col, row2, col2;
 
-void readMatrix(int mat[MAX][MAX], int rows, int cols) {
-    printf("Enter elements (use 0 for sparse positions):\n");
-    for (int i = 0; i < rows; i++)
-        for (int j = 0; j < cols; j++)
-            scanf("%d", &mat[i][j]);
-}
+    printf("Enter the row and column of 1st matrix:\n");
+    scanf("%d %d", &row, &col);
 
-void displayMatrix(int mat[MAX][MAX], int rows, int cols) {
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++)
-            printf("%d ", mat[i][j]);
+    printf("Enter the row and column of 2nd matrix:\n");
+    scanf("%d %d", &row2, &col2);
+
+    if (row != row2 || col != col2) {
+        printf("Matrix dimensions must match for addition.\n");
+        return 1;
+    }
+
+    int arr[row][col], arr2[row2][col2];
+
+    printf("Enter the first sparse matrix:\n");
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            scanf("%d", &arr[i][j]);
+        }
+    }
+
+    printf("Enter the second sparse matrix:\n");
+    for (int i = 0; i < row2; i++) {
+        for (int j = 0; j < col2; j++) {
+            scanf("%d", &arr2[i][j]);
+        }
+    }
+
+    printf("The 1st sparse matrix is:\n");
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            printf("%d ", arr[i][j]);
+        }
         printf("\n");
     }
-}
 
-void addMatrices(int a[MAX][MAX], int b[MAX][MAX], int sum[MAX][MAX], int rows, int cols) {
-    for (int i = 0; i < rows; i++)
-        for (int j = 0; j < cols; j++)
-            sum[i][j] = a[i][j] + b[i][j];
-}
+    printf("The 2nd sparse matrix is:\n");
+    for (int i = 0; i < row2; i++) {
+        for (int j = 0; j < col2; j++) {
+            printf("%d ", arr2[i][j]);
+        }
+        printf("\n");
+    }
 
-void transposeMatrix(int mat[MAX][MAX], int trans[MAX][MAX], int rows, int cols) {
-    for (int i = 0; i < rows; i++)
-        for (int j = 0; j < cols; j++)
-            trans[j][i] = mat[i][j];
-}
+    int arr3[row][col];
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            arr3[i][j] = arr[i][j] + arr2[i][j];
+        }
+    }
 
-int main() {
-    int rows, cols;
-    int mat1[MAX][MAX], mat2[MAX][MAX], sum[MAX][MAX], transpose[MAX][MAX];
+    printf("The resultant sparse matrix is:\n");
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            printf("%d ", arr3[i][j]);
+        }
+        printf("\n");
+    }
 
-    printf("Enter number of rows and columns: ");
-    scanf("%d%d", &rows, &cols);
+    // Transpose of arr3
+    int transpose[col][row];
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            transpose[j][i] = arr3[i][j];
+        }
+    }
 
-    printf("\nEnter first sparse matrix:\n");
-    readMatrix(mat1, rows, cols);
+    printf("The transpose matrix is:\n");
+    for (int i = 0; i < col; i++) {
+        for (int j = 0; j < row; j++) {
+            printf("%d ", transpose[i][j]);
+        }
+        printf("\n");
+    }
 
-    printf("\nEnter second sparse matrix:\n");
-    readMatrix(mat2, rows, cols);
+    // Compact matrix representation of transpose
+    printf("The compact matrix of transpose is:\n");
 
-    addMatrices(mat1, mat2, sum, rows, cols);
-    printf("\nSum of the matrices:\n");
-    displayMatrix(sum, rows, cols);
+    // Count non-zero elements
+    int count = 0;
+    for (int i = 0; i < col; i++) {
+        for (int j = 0; j < row; j++) {
+            if (transpose[i][j] != 0) {
+                count++;
+            }
+        }
+    }
 
-    transposeMatrix(sum, transpose, rows, cols);
-    printf("\nTranspose of the resulting matrix:\n");
-    displayMatrix(transpose, cols, rows);
+    // Print header of compact matrix
+    printf("%d %d %d\n", col, row, count);  // rows, cols, non-zero count
+
+    // Print each non-zero element as (row, col, value)
+    for (int i = 0; i < col; i++) {
+        for (int j = 0; j < row; j++) {
+            if (transpose[i][j] != 0) {
+                printf("%d %d %d\n", i, j, transpose[i][j]);
+            }
+        }
+    }
 
     return 0;
 }
