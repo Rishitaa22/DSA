@@ -1,93 +1,83 @@
-Program:
 #include<stdio.h>
+#include<stdlib.h>
 #include<string.h>
-#define MAX 100
-typedef struct Node{
-char url[100];
-int prev;
-int next;
-}Node;
-Node pages[MAX];
-int current =-1;
-int last =-1;
-int createNode(char *url){
-if(last>=MAX-1){
-printf("History is Full :\n");
-return -1;
-}last++;
-strcpy(pages[last].url,url);
-pages[last].prev=-1;
-pages[last].next=-1;
-return last;
+struct Node{
+  char url[100];
+  struct Node*prev;
+  struct Node*next;
+};
+struct Node*current=NULL;
+struct Node*createNode(char*url){
+  struct Node*newNode=(struct Node*)
+  malloc(sizeof(struct Node));
+  strcpy(newNode->url,url);
+  newNode->prev=NULL;
+  newNode->next=NULL;
+  return newNode;
 }
-void visitPage(char *url){
-int newNode = createNode(url);
-if(newNode ==-1)
-return;
-if(current!=-1){
-pages[current].next = -1;
-pages[newNode].prev = current;
-pages[current].next = newNode;
+
+void openPage(char*url){
+  struct Node*newNode=createNode(url);
+  if (current!=NULL){
+    struct Node*temp=current->next;
+    while(temp!=NULL){
+      struct Node*toDelete=temp;
+      temp=temp->next;
+      free(toDelete);
+    }
+    current->next=newNode;
+    newNode->prev=current;
+  }
+  current=newNode;
+  printf("Opened:%s\n",current->url);
 }
-current = newNode;
-printf("Visited: %s\n",pages[current].url);
-}
-void goBack(){if (current==-1||pages[current].prev==-1){
-printf("No Previous pages!\n");
-}else {
-current = pages[current].prev;
-printf("Went Back : %s\n",pages[current].url);
-}
+void goBack(){
+  if(current!=NULL && current->prev!=NULL){
+    current=current->prev;
+    printf("Back to:%s\n",current->url);
+  }else{
+    printf("No previous page\n");
+  }
 }
 void goForward(){
-if (current==-1||pages[current].next ==-1){
-printf("No Forward pages!\n");
-}else {
-current = pages[current].next;
-printf("Went Forward : 
-%s\n",pages[current].url);
+  if(current!=NULL&& current->next!=NULL){
+    current=current->next;
+    printf("Forward to:%s\n",current->url);
+  }else{
+    printf("No forward page\n");
+  }
 }
-}
-void showCurrent(){
-if(current ==-1){
-printf("No pages currently open!\n");
-} else{printf("Current pages 
-:%s\n",pages[current].url);
+void displayCurrent(){
+  if(current!=NULL){
+    printf("current page:%s\n",current->url);
+}else{
+    printf("No page Opened\n");
 }
 }
 int main(){
-int choice;
-char url[100];
-while(1){
-printf("\n \t Browser Navigation \t\n");
-printf("1. Visit page \n");
-printf("2. Go Back \n");
-printf("3. Go Forward \n");
-printf("4. Show current page \n");
-printf("5. Exit \n");
-printf("Enter the choice :");
-scanf("%d",&choice);
-getchar();
-switch (choice){
-case 1:
-printf("Enter the URL:");fgets(url,sizeof(url),stdin);
-url[strcspn(url,"/n")]=0;
-visitPage(url);
-break;
-case 2:
-goBack();
-break;
-case 3:
-goForward();
-break;
-case 4:
-showCurrent();
-break;
-case 5:
-printf("Exiting the program!\n");
-return 0;
-default :
-printf("invalid Choice!\n");
-}
-}
+  int choice;
+  char url[100];
+  while(1){
+    printf("--Menu--\n");
+    printf("1.Open New page\t2.Back\t3.Forward\t4.Current page\t5.Exit\n");
+    printf("Enter Choice:");
+    scanf("%d",&choice);
+    switch(choice){
+      case 1:printf("Enter URL:");
+            scanf("%s",url);
+            openPage(url);
+            break;
+      case 2:goBack();      
+            break;
+      case 3:goForward();
+             break;      
+      case 4:displayCurrent();
+             break;      
+      case 5:printf("Exiting Program\n");
+             exit(0);
+             break;
+      default:printf("Invalid choice\n");      
+    }
+  }
+  return 0;
 }
